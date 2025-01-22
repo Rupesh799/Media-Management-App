@@ -1,17 +1,15 @@
 import { useState, useEffect } from "react";
-
 import toast from "react-hot-toast";
-
 import "./style.css";
 import { FaTrash, FaUpload } from "react-icons/fa";
-
+import { Image, Modal } from "antd";
 import { MdCancel, MdFileDownload } from "react-icons/md";
 
 function UploadForm() {
   const [files, setFiles] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState(null);
   const [isFileUploaded, setIsFileUploaded] = useState(false);
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
   useEffect(() => {
     const fetchFiles = async () => {
       try {
@@ -146,10 +144,10 @@ function UploadForm() {
       ["jpg", "jpeg", "png", "gif"].includes(fileType)
     ) {
       return (
-        <img
+        <Image
           src={fileUrl}
           alt={file.file_name}
-          className="max-w-full max-h-[400px] h-[300px] object-cover mx-auto rounded-t-md "
+          className="max-w-full max-h-[400px] h-full  object-cover  rounded-t-md "
         />
       );
     } else if (
@@ -157,14 +155,31 @@ function UploadForm() {
       ["mp4", "webm"].includes(fileType)
     ) {
       return (
-        <video
-          controls
-          autoPlay
-          className="w-full max-h-[400px] h-[300px] rounded-tl-md"
-        >
-          <source src={fileUrl} type={`video/${fileType}`} />
-          Your browser does not support the video tag.
-        </video>
+        <div className="relative ">
+          <video
+            onClick={() => setIsModalOpen(true)}
+            className="w-full max-h-[400px] h-full object-cover  rounded-tl-md cursor-pointer"
+            title="Click to play"
+          >
+            <source src={fileUrl} type={`video/${fileType}`} />
+            Your browser does not support the video tag.
+          </video>
+
+          <Modal
+            open={isModalOpen}
+            onCancel={() => setIsModalOpen(false)}
+            footer={null}
+            width={500}
+          >
+            <video
+              controls
+              className="w-full flex justify-center items-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+            >
+              <source src={fileUrl} type={`video/${fileType}`} />
+              Your browser does not support the video tag.
+            </video>
+          </Modal>
+        </div>
       );
     } else if (
       fileType.startsWith("audio/") ||
