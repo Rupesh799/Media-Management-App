@@ -194,6 +194,28 @@ function UploadForm() {
     }
   };
 
+  const handleDownload = async (file) => {
+    const fileUrl = file.file.startsWith("http")
+      ? file.file
+      : `http://127.0.0.1:8000${file.file}`;
+
+    try {
+      const response = await fetch(fileUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = file.file_name;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error("Download failed:", error);
+      toast.error("Download failed");
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto flex flex-col rounded-md  p-4 w-full">
       <div className="w-full flex justify-between items-center px-6 py-10">
@@ -263,19 +285,14 @@ function UploadForm() {
                   </div>
                   <div className="flex justify-between w-full px-4 items-center space-y-4">
                     <h3 className="font-medium ">{file.file_name}</h3>
-                    <a
-                      href={
-                        file.file.startsWith("http")
-                          ? file.file
-                          : `http://localhost:8000${file.file}`
-                      }
-                      download
-                      target="_blank"
+                    <button
+                      // target="_blank"
+                      onClick={() => handleDownload(file)}
                       className=" rounded-md text-white w-fit flex gap-2 items-center justify-center mb-4 "
                     >
                       <MdFileDownload size={20} color="blue" />{" "}
                       {/* <span>Download</span> */}
-                    </a>
+                    </button>
                   </div>
 
                   <div className=" absolute left-2 top-2 flex flex-wrap gap-4 text-sm text-gray-400 opacity-100 group-hover:opacity-0">
